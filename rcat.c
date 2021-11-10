@@ -1,4 +1,8 @@
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 #define BLOCK_SIZE (1024)
 
@@ -8,12 +12,13 @@ int main(int argc, char *argv[]) {
           return 1;
      }
 
-     FILE *in;
+     int in;
 
-     in = fopen(argv[1], "rb");
+     in = open(argv[1], O_RDONLY);
 
-     if (in == NULL) {
-          fprintf(stderr, "Input file not found: %s", argv[1]);
+     if (in == -1) {
+          fprintf(stderr, "Error opening input file: %s (%s)",
+                  argv[1], strerror(errno));
           return 2;
      }
 
@@ -21,17 +26,19 @@ int main(int argc, char *argv[]) {
      size_t n;
 
      while(1) {
-          n = fread(block_buf, 1, BLOCK_SIZE, in);
+          size_t bytes_read = read(in, block_buf, BLOCK_SIZE);
 
-          if (n == 0) {
+          fprintf(stderr, "n=%zu, errno=%d\n", bytes_read, errno);
+
+          if (bytes_read == 0) {
                break;
           }
 
-          fprintf(stderr, "n=%d\n", n);
-          fwrite(block_buf, 1, n, stdout);
+
+          fwrite(block_buf, 1, bytes_read, stdout);
      }
 
-     fclose(in);
+     close(in);
 
      return 0;
 }
