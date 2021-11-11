@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#define BLOCK_SIZE (1024)
+#define BLOCK_SIZE (32 * 1024)
 
 int main(int argc, char *argv[]) {
      if (argc != 2) {
@@ -28,10 +28,12 @@ int main(int argc, char *argv[]) {
      size_t n;
 
      read_ofs = 0;
+     int failed = 0;
 
      while(1) {
-          if (read_ofs % (1024 * 1024) == 0) {
+          if (failed || (read_ofs % (1024 * 1024) == 0)) {
                fprintf(stderr, "ofs=%zu\n", read_ofs);
+               failed = 0;
           }
 
           lseek(in, read_ofs, SEEK_SET);
@@ -42,8 +44,8 @@ int main(int argc, char *argv[]) {
           if (bytes_read == 0) {
                break;
           } else if (bytes_read == -1) {
-               fprintf(stderr, "ofs=%zu, n=%zu, errno=%s\n",
-                       read_ofs, bytes_read, strerror(errno));
+               fprintf(stderr, "ofs=%zu, (error: %s)\n", read_ofs, strerror(errno));
+               failed = 1;
 
                if (EINTR == errno) {
                     continue;
