@@ -1,3 +1,13 @@
+/*
+ * rcat.c --
+ *
+ * (C) Copyright 2021 Mike Schaeffer
+ *
+ * See the file "license.terms" for information on usage and redistribution
+ * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ */
+
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
