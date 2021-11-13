@@ -3,8 +3,9 @@
  *
  * (C) Copyright 2021 Mike Schaeffer
  *
- * See the file "license.terms" for information on usage and redistribution
- * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ * See the file "license.terms" for information on usage and
+ * redistribution of this file, and for a DISCLAIMER OF ALL
+ * WARRANTIES.
  */
 
 
@@ -16,19 +17,15 @@
 
 #define BLOCK_SIZE (32 * 1024)
 
-int main(int argc, char *argv[]) {
-     if (argc != 2) {
-          fprintf(stderr, "Usage: %s FILENAME\n", argv[0]);
-          return 1;
-     }
 
+int rcat(char *filename) {
      int in;
 
-     in = open(argv[1], O_RDONLY);
+     in = open(filename, O_RDONLY);
 
      if (in == -1) {
           fprintf(stderr, "Error opening input file: %s (%s)",
-                  argv[1], strerror(errno));
+                  filename, strerror(errno));
           return 2;
      }
 
@@ -71,6 +68,24 @@ int main(int argc, char *argv[]) {
      }
 
      close(in);
+
+     return 0;
+}
+
+int main(int argc, char *argv[]) {
+     if (argc < 2) {
+          fprintf(stderr, "Usage: %s FILENAME(s)\n", argv[0]);
+          return 1;
+     }
+
+     for(int ii = 1; ii < argc; ii++) {
+          int rc = rcat(argv[ii]);
+
+          if (rc) {
+               return rc;
+          }
+     }
+
 
      return 0;
 }
